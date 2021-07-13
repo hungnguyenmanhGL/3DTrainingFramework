@@ -7,10 +7,12 @@
 #include "Shaders.h"
 #include "Globals.h"
 #include <conio.h>
+#include <GLES2/gl2.h>
 
 
 GLuint vboId;
 Shaders myShaders;
+
 
 int Init ( ESContext *esContext )
 {
@@ -28,6 +30,8 @@ int Init ( ESContext *esContext )
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesData), verticesData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+
 
 	//creation of shaders and program 
 	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
@@ -42,15 +46,26 @@ void Draw ( ESContext *esContext )
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 
+	GLfloat colors[] = {
+		255,0,0,
+		0,255,0,
+		0,0,255
+	};
+
 	
+
 	if(myShaders.positionAttribute != -1)
 	{
 		glEnableVertexAttribArray(myShaders.positionAttribute);
 		glVertexAttribPointer(myShaders.positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	}
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
+	GLushort indices[]{ 0,1,2 };
+
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, &indices);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	eglSwapBuffers ( esContext->eglDisplay, esContext->eglSurface );
