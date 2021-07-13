@@ -9,10 +9,9 @@
 #include <conio.h>
 #include <GLES2/gl2.h>
 
-
 GLuint vboId;
 Shaders myShaders;
-
+float *colors = new float[9];
 
 int Init ( ESContext *esContext )
 {
@@ -25,14 +24,17 @@ int Init ( ESContext *esContext )
 	verticesData[1].pos.x = -0.5f;  verticesData[1].pos.y = -0.5f;  verticesData[1].pos.z =  0.0f;
 	verticesData[2].pos.x =  0.5f;  verticesData[2].pos.y = -0.5f;  verticesData[2].pos.z =  0.0f;
 
+
+	colors[0] = 1.0; colors[1] = 1.0; colors[2] = 1.0;
+	colors[3] = 1.0; colors[4] = 0.0; colors[5] = 0.0;
+	colors[6] = 0.0; colors[7] = 1.0; colors[8] = 0.0;
 	//buffer object
 	glGenBuffers(1, &vboId);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesData), verticesData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
-
-
 	//creation of shaders and program 
 	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 
@@ -44,25 +46,24 @@ void Draw ( ESContext *esContext )
 
 	glUseProgram(myShaders.program);
 
+	GLint color = glGetAttribLocation(myShaders.program, "a_color");
+
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 
-	GLfloat colors[] = {
-		255,0,0,
-		0,255,0,
-		0,0,255
-	};
-
+	GLushort indices[]{ 0,1,2 };
 	
-
 	if(myShaders.positionAttribute != -1)
 	{
 		glEnableVertexAttribArray(myShaders.positionAttribute);
 		glVertexAttribPointer(myShaders.positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	}
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	if (color != -1) {
+		glVertexAttribPointer(color, 4, GL_FLOAT, GL_FALSE, sizeof(colors), 0);
+		glEnableVertexAttribArray(color);
+	}
 
-	GLushort indices[]{ 0,1,2 };
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, &indices);
 	
