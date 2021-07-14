@@ -7,102 +7,118 @@
 #include "Shaders.h"
 #include "Globals.h"
 #include <conio.h>
-#include <GLES2/gl2.h>
 
-GLuint vboId;
+
+GLuint vboId[2], iboId;
 Shaders myShaders;
-float *colors = new float[9];
-
-int Init ( ESContext *esContext )
+struct  Color
 {
-	glClearColor ( 1.0f, 1.0f, 1.0f, 1.0f );
+	Vector3 color;
+};
+
+int Init(ESContext* esContext)
+{
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	//triangle data (heap)
 	Vertex verticesData[3];
+	Color color[3];
 
-	verticesData[0].pos.x =  0.0f;  verticesData[0].pos.y =  0.5f;  verticesData[0].pos.z =  0.0f;
-	verticesData[1].pos.x = -0.5f;  verticesData[1].pos.y = -0.5f;  verticesData[1].pos.z =  0.0f;
-	verticesData[2].pos.x =  0.5f;  verticesData[2].pos.y = -0.5f;  verticesData[2].pos.z =  0.0f;
+	verticesData[0].pos.x = 0.0f;  verticesData[0].pos.y = 0.5f;  verticesData[0].pos.z = 0.0f;
+	verticesData[1].pos.x = -0.5f;  verticesData[1].pos.y = -0.5f;  verticesData[1].pos.z = 0.0f;
+	verticesData[2].pos.x = 0.5f;  verticesData[2].pos.y = -0.5f;  verticesData[2].pos.z = 0.0f;
 
+	color[0].color.x = 0.0f;  color[0].color.y = 0.0f;  color[0].color.z = 1.0f;
+	color[1].color.x = 1.0f;  color[1].color.y = 0.0f;  color[1].color.z = 0.0f;
+	color[2].color.x = 0.0f;  color[2].color.y = 1.0f;  color[2].color.z = 0.0f;
 
-	colors[0] = 1.0; colors[1] = 1.0; colors[2] = 1.0;
-	colors[3] = 1.0; colors[4] = 0.0; colors[5] = 0.0;
-	colors[6] = 0.0; colors[7] = 1.0; colors[8] = 0.0;
+	int indices[] = { 0, 1, 2 };
 	//buffer object
-	glGenBuffers(1, &vboId);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, vboId);
+	glGenBuffers(2, &vboId[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, vboId[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesData), verticesData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
+	glBindBuffer(GL_ARRAY_BUFFER, vboId[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &iboId);
+	glBindBuffer(GL_ARRAY_BUFFER, iboId);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	//creation of shaders and program 
 	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 
 }
 
-void Draw ( ESContext *esContext )
+void Draw(ESContext* esContext)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(myShaders.program);
 
-	GLint color = glGetAttribLocation(myShaders.program, "a_color");
 
-	glBindBuffer(GL_ARRAY_BUFFER, vboId);
+	glBindBuffer(GL_ARRAY_BUFFER, vboId[0]);
 
-	GLushort indices[]{ 0,1,2 };
-	
-	if(myShaders.positionAttribute != -1)
+	if (myShaders.positionAttribute != -1)
 	{
 		glEnableVertexAttribArray(myShaders.positionAttribute);
 		glVertexAttribPointer(myShaders.positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	}
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+	//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
-	if (color != -1) {
-		glVertexAttribPointer(color, 4, GL_FLOAT, GL_FALSE, sizeof(colors), 0);
-		glEnableVertexAttribArray(color);
+	glBindBuffer(GL_ARRAY_BUFFER, vboId[1]);
+
+	if (myShaders.colorAttribute != -1)
+	{
+		glEnableVertexAttribArray(myShaders.colorAttribute);
+		glVertexAttribPointer(myShaders.colorAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Color), 0);
 	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, &indices);
-	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	eglSwapBuffers ( esContext->eglDisplay, esContext->eglSurface );
+	eglSwapBuffers(esContext->eglDisplay, esContext->eglSurface);
 }
 
-void Update ( ESContext *esContext, float deltaTime )
+void Update(ESContext* esContext, float deltaTime)
 {
 
 }
 
-void Key ( ESContext *esContext, unsigned char key, bool bIsPressed)
+void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
 {
 
 }
 
 void CleanUp()
 {
-	glDeleteBuffers(1, &vboId);
+	glDeleteBuffers(1, &vboId[0]);
+	glDeleteBuffers(1, &vboId[1]);
+	glDeleteBuffers(1, &iboId);
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int argc, TCHAR* argv[])
 {
 	ESContext esContext;
 
-    esInitContext ( &esContext );
+	esInitContext(&esContext);
 
-	esCreateWindow ( &esContext, "Hello Triangle", Globals::screenWidth, Globals::screenHeight, ES_WINDOW_RGB | ES_WINDOW_DEPTH);
+	esCreateWindow(&esContext, "Hello Triangle", Globals::screenWidth, Globals::screenHeight, ES_WINDOW_RGB | ES_WINDOW_DEPTH);
 
-	if ( Init ( &esContext ) != 0 )
+	if (Init(&esContext) != 0)
 		return 0;
 
-	esRegisterDrawFunc ( &esContext, Draw );
-	esRegisterUpdateFunc ( &esContext, Update );
-	esRegisterKeyFunc ( &esContext, Key);
+	esRegisterDrawFunc(&esContext, Draw);
+	esRegisterUpdateFunc(&esContext, Update);
+	esRegisterKeyFunc(&esContext, Key);
 
-	esMainLoop ( &esContext );
+	esMainLoop(&esContext);
 
 	//releasing OpenGL resources
 	CleanUp();
@@ -114,4 +130,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	return 0;
 }
+
+
 

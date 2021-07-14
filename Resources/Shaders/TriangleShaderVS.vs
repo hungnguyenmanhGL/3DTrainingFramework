@@ -1,11 +1,11 @@
 attribute vec3 a_posL;
-attribute vec4 a_color;
-varying vec4 v_color;
+attribute vec3 a_color;
+varying vec3 v_color;
+varying vec3 v_pos;
 void main()
 {
-v_color = a_color;
-vec4 posL = vec4(a_posL, 1.0);
-gl_Position = posL;
-
+	vec4 posL = vec4(a_posL, 1.0);
+	gl_Position = posL;
+	v_color = a_color;
 }
    
