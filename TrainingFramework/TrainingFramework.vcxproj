@@ -93,6 +93,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TrainingFramework.cpp" />
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -102,9 +104,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="TriangleVertex.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
@@ -118,6 +123,9 @@
       <Project>{0d44529e-f7dd-4454-8ead-9afd857f53b4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TrainingFramework.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
