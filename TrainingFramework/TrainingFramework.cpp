@@ -89,7 +89,7 @@ void Draw(ESContext* esContext)
 	//mvp->TranslateModel(1.0f, 1.0f, 0.0f);
 	mvp->transform();
 	glDrawElements(GL_TRIANGLES, modelWoman->mNumberOfIndices, GL_UNSIGNED_INT, 0);
-	
+	delete mvp;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -111,6 +111,8 @@ void CleanUp()
 {
 	glDeleteBuffers(1, &vboId);
 	glDeleteBuffers(1, &iboId);
+	delete modelWoman;
+	delete textureWoman;
 }
 
 int _tmain(int argc, TCHAR* argv[])

@@ -70,6 +70,8 @@ void Model::LoadNFGFile(FILE *file)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	this->mNumberOfIndices = numIndices;
 	fclose(file);
+	delete vertices;
+	delete indices;
 };
 
 Model::Model(const char* modelFilePath)

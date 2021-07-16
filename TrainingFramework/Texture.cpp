@@ -35,6 +35,7 @@ void Texture::Init()
 	}
 	ConfigTexture();
 	glBindTexture(GL_TEXTURE_2D, 0);
+	delete imageData;
 }
 Texture::Texture(const char* tgaFilePath)
 {
