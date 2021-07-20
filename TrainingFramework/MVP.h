@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <GLES2/gl2.h>
 #include "Shaders.h"
+#include "Camera.h"
 #include "../Utilities/Math.h"
 #include "../Utilities/utilities.h"
 class MVP
@@ -24,6 +25,7 @@ public:
 	//Vector4 vec = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	MVP(Shaders s);
+	MVP();
 
 	void RotateModel(GLfloat aX, GLfloat aY, GLfloat aZ);
 	void ScaleModel(Vector3 scaleVec);
@@ -32,5 +34,7 @@ public:
 	void TranslateModel(GLfloat x, GLfloat y, GLfloat z);
 
 	void transform();
+	void transform(Matrix m1, Matrix m2, Matrix m3);
+	void transform(Matrix v, Matrix p);
 };
 

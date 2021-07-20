@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include "Texture.h"
 #include "Model.h"
+#include "Camera.h"
 #include "MVP.h"
 #include "Math.h"
 #include <conio.h>
@@ -18,7 +19,9 @@ GLuint vboId, iboId;
 Shaders myShaders;
 Texture* textureWoman;
 Model* modelWoman;
-MVP* mvp;
+MVP mvp;
+GLfloat a = 1.0f;
+Camera cam = Camera();
 
 int Init(ESContext* esContext)
 {
@@ -34,12 +37,15 @@ int Init(ESContext* esContext)
 	glBindBuffer(GL_ARRAY_BUFFER, iboId);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	
+	//cam.GetPerspective();
+	//cam.GetViewMatrix();
+	//cam.GetWorldMatrix();
+	cam.camWorld();
 	//Textures
 	textureWoman = new Texture("../Resources/Woman1.tga");
 	textureWoman->Init();
 	glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);
-	
 	glEnable(GL_DEPTH_TEST);
 
 	//task 4 load
@@ -47,8 +53,6 @@ int Init(ESContext* esContext)
 	modelWoman->Init();
 	glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
-
-
 	//creation of shaders and program 
 	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 
@@ -83,27 +87,39 @@ void Draw(ESContext* esContext)
 	
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
-	mvp = new MVP(myShaders);
-	mvp->RotateModel(0.0f,3.14f, 3.14f);
-	mvp->ScaleModel(0.8f);
-	//mvp->TranslateModel(1.0f, 1.0f, 0.0f);
-	mvp->transform();
+	mvp = MVP(myShaders);
+	//mvp.RotateModel(2.0f,3.14f, 3.14f);
+	//mvp.ScaleModel(0.8f);
+	//mvp.TranslateModel(0.2f, 0.0f, 1.0f);
+	mvp.transform(cam.GetViewMatrix(), cam.GetPerspective());//CameraWorld Transform
 	glDrawElements(GL_TRIANGLES, modelWoman->mNumberOfIndices, GL_UNSIGNED_INT, 0);
-	delete mvp;
+	
+	//delete mvp;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+	
 	eglSwapBuffers(esContext->eglDisplay, esContext->eglSurface);
 }
 
 void Update(ESContext* esContext, float deltaTime)
 {
-
+	
 }
 
 void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
 {
+	switch (key)
+	{
+	case 'W': cam.caseW(); break;
+	case 'w' : cam.caseW();
+
+	case 'A': cam.caseA(); break;
+
+	case 'S': cam.caseS(); break;
+
+	case 'D': cam.caseD(); break;
+	}
 
 }
 

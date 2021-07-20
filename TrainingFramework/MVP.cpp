@@ -3,6 +3,7 @@
 #include <GLES2/gl2.h>
 #include "MVP.h"
 #include "Shaders.h"
+#include "Camera.h"
 #include "../Utilities/Math.h"
 #include "../Utilities/utilities.h"
 
@@ -10,6 +11,8 @@ MVP::MVP(Shaders mShader)
 {
 	s = mShader;
 };
+
+MVP::MVP() {};
 
 void MVP::ScaleModel(Vector3 scaleVec)
 {
@@ -46,3 +49,19 @@ void MVP::transform()
 	GLint transLoc = glGetUniformLocation(s.program, "transform");
 	glUniformMatrix4fv(transLoc, 1, GL_FALSE, *mWorldMatrix.m);
 };
+
+void MVP::transform(Matrix w, Matrix v, Matrix p)
+{
+	mWorldMatrix = w*v*p;
+	mWorldMatrix = mWorldMatrix.Invert(mWorldMatrix);
+	GLint transLoc = glGetUniformLocation(s.program, "transform");
+	glUniformMatrix4fv(transLoc, 1, GL_FALSE, *mWorldMatrix.m);
+}
+
+void MVP::transform(Matrix v, Matrix p)
+{
+	mWorldMatrix = v * p;
+	GLint transLoc = glGetUniformLocation(s.program, "transform");
+	glUniformMatrix4fv(transLoc, 1, GL_FALSE, *mWorldMatrix.m);
+}
+

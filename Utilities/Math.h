@@ -167,4 +167,5 @@ public:
 
 	//data members
 	GLfloat m[4][4];
+	Matrix Invert(Matrix mx);
 };
