@@ -15,13 +15,16 @@
 #include <iostream>
 #include <GLES2/gl2.h>
 
+
 #define MOVE_FORWARD 1
 #define MOVE_BACKWARD 1 << 1
 #define MOVE_LEFT 1 << 2
 #define MOVE_RIGHT 1 << 3
-#define ROTATE_X 1 << 4
-#define ROTATE_Y 1 << 5
+#define ROTATE_X_UP 1 << 4
+#define ROTATE_Y_LEFT 1 << 5
 #define ROTATE_Z 1 << 6
+#define ROTATE_X_DOWN 1 << 7
+#define ROTATE_Y_RIGHT 1 << 8
 
 int keyPressed = 0;
 
@@ -31,6 +34,7 @@ Texture* textureWoman;
 Model* modelWoman;
 MVP *mvp = new MVP(myShaders);
 Camera cam = Camera();
+
 
 int Init(ESContext* esContext)
 {
@@ -60,6 +64,7 @@ int Init(ESContext* esContext)
 	//cam.GetViewMatrix();
 	//cam.GetWorldMatrix();
 	//creation of shaders and program 
+	
 	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 
 }
@@ -123,12 +128,20 @@ void Update(ESContext* esContext, float deltaTime)
 		cam.caseD(deltaTime);
 	}
 
-	if (keyPressed & ROTATE_X) {
+	if (keyPressed & ROTATE_X_UP) {
 		cam.RotateAroundX(deltaTime);
 	}
 
-	if (keyPressed & ROTATE_Y) {
+	if (keyPressed & ROTATE_X_DOWN) {
+		cam.RotateAroundX(-deltaTime);
+	}
+
+	if (keyPressed & ROTATE_Y_LEFT) {
 		cam.RotateAroundY(deltaTime);
+	}
+
+	if (keyPressed & ROTATE_Y_RIGHT) {
+		cam.RotateAroundY(-deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Z) {
@@ -158,14 +171,23 @@ void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
 			keyPressed = keyPressed | MOVE_RIGHT;
 			return;
 		}
-		if (key == 'x' || key == 'X') {
-			keyPressed = keyPressed | ROTATE_X;
+		if (key == VK_UP) {
+			keyPressed = keyPressed | ROTATE_X_UP;
 			return;
 		}
-		if (key == 'y' || key == 'Y') {
-			keyPressed = keyPressed | ROTATE_Y;
+		if (key == VK_DOWN) {
+			keyPressed = keyPressed | ROTATE_X_DOWN;
+		}
+
+		if (key == VK_LEFT) {
+			keyPressed = keyPressed | ROTATE_Y_LEFT;
 			return;
 		}
+		if (key == VK_RIGHT) {
+			keyPressed = keyPressed | ROTATE_Y_RIGHT;
+			return;
+		}
+
 		if (key == 'z' || key == 'Z') {
 			keyPressed = keyPressed | ROTATE_Z;
 			return;
@@ -190,12 +212,19 @@ void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
 			keyPressed = keyPressed ^ MOVE_RIGHT;
 			return;
 		}
-		if (key == 'x' || key == 'X') {
-			keyPressed = keyPressed ^ ROTATE_X;
+		if (key == VK_UP ) {
+			keyPressed = keyPressed ^ ROTATE_X_UP;
 			return;
 		}
-		if (key == 'y' || key == 'Y') {
-			keyPressed = keyPressed ^ ROTATE_Y;
+		if (key == VK_DOWN) {
+			keyPressed = keyPressed ^ ROTATE_X_DOWN;
+		}
+		if (key == VK_LEFT) {
+			keyPressed = keyPressed ^ ROTATE_Y_LEFT;
+			return;
+		}
+		if (key == VK_RIGHT) {
+			keyPressed = keyPressed ^ ROTATE_Y_RIGHT;
 			return;
 		}
 		if (key == 'z' || key == 'Z') {

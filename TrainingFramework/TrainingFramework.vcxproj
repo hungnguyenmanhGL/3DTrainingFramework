@@ -96,6 +96,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="MVP.cpp" />
+    <ClCompile Include="ResourcesManager.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TrainingFramework.cpp" />
     <ClCompile Include="Shaders.cpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="MVP.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourcesManager.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

@@ -8,6 +8,9 @@ private:
 	void ConfigTexture();
 public:
 	GLuint mTextureId;
+	GLuint wrapMode;
+	GLuint filterMode;
+
 	void Init();
 	Texture(const char* tgaFilePath);
 	~Texture();
