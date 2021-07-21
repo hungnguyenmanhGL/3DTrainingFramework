@@ -7,9 +7,15 @@
 #include "../Utilities/Math.h"
 #include "../Utilities/utilities.h"
 
-MVP::MVP(Shaders mShader)
+MVP::MVP(Shaders Shader)
 {
-	s = mShader;
+	mShader = Shader;
+	rX.SetIdentity();
+	rY.SetIdentity();
+	rZ.SetIdentity();
+	mScalingMatrix.SetIdentity();
+	mRotationMatrix.SetIdentity();
+	mTranslationMatrix.SetIdentity();
 };
 
 MVP::MVP() {};
@@ -46,7 +52,7 @@ void MVP::TranslateModel(GLfloat x, GLfloat y, GLfloat z)
 void MVP::transform()
 {
 	mWorldMatrix = mScalingMatrix * mRotationMatrix * mTranslationMatrix;
-	GLint transLoc = glGetUniformLocation(s.program, "transform");
+	GLint transLoc = glGetUniformLocation(mShader.program, "transform");
 	glUniformMatrix4fv(transLoc, 1, GL_FALSE, *mWorldMatrix.m);
 };
 
@@ -54,14 +60,15 @@ void MVP::transform(Matrix w, Matrix v, Matrix p)
 {
 	mWorldMatrix = w*v*p;
 	mWorldMatrix = mWorldMatrix.Invert(mWorldMatrix);
-	GLint transLoc = glGetUniformLocation(s.program, "transform");
+	GLint transLoc = glGetUniformLocation(mShader.program, "transform");
 	glUniformMatrix4fv(transLoc, 1, GL_FALSE, *mWorldMatrix.m);
 }
 
 void MVP::transform(Matrix v, Matrix p)
 {
-	mWorldMatrix = v * p;
-	GLint transLoc = glGetUniformLocation(s.program, "transform");
-	glUniformMatrix4fv(transLoc, 1, GL_FALSE, *mWorldMatrix.m);
+	mWorldMatrix = mScalingMatrix * mRotationMatrix * mTranslationMatrix;
+	glUniformMatrix4fv(mShader.u_Model, 1, GL_FALSE, *mWorldMatrix.m);
+	glUniformMatrix4fv(mShader.u_View, 1, GL_FALSE, *v.m);
+	glUniformMatrix4fv(mShader.u_Projection, 1, GL_FALSE, *p.m);
 }
 

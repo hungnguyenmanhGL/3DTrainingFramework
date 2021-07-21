@@ -21,7 +21,7 @@ public:
 
 	Matrix mWorldMatrix; //= mScalingMatrix * mRotationMatrix * mTranslationMatrix;
 	//Vector4 mTransformedVec = mModelMatrix * originalVec;
-	Shaders s;
+	Shaders mShader;
 	//Vector4 vec = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	MVP(Shaders s);

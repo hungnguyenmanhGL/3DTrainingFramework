@@ -11,56 +11,49 @@
 
 Camera::Camera()
 {
-
+	float aspect = (float)Globals::screenWidth / Globals::screenHeight;
+	
+	camPerspective.SetPerspective(mFOV, aspect, mNear, mFar);
+	Update();
 }
 
-//Camera::Camera(MVP mvp)
-//{
-//	camMVP = mvp;
-//}
-
-void Camera::camWorld()
+void Camera::Update()
 {
-	Matrix mx = GetWorldMatrix() * GetViewMatrix() * GetPerspective();
-	std::cout << "World Cam Matrix: " << std::endl;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			std::cout << mx.m[i][j] << " ";
-		}
-		std::cout << std::endl;
-	}
+	zaxis = (cameraPos - cameraTarget).Normalize();//cameraDirect
+	xaxis = (up.Cross(zaxis)).Normalize();//cameraRight
+	yaxis = (zaxis.Cross(xaxis)).Normalize();
 }
 
-void Camera::caseW()
+void Camera::caseW(float deltaTime)
 {
-	Vector3 deltaMove = -(cameraPos - cameraTarget).Normalize() * 0.2f * cameraSpeed;
+	Vector3 deltaMove = -(cameraPos - cameraTarget).Normalize() * deltaTime*2 * cameraSpeed;
 	cameraPos += deltaMove;
 	cameraTarget += deltaMove;
-	std::cout << "W";
+	//std::cout << "W";
 }
 
-void Camera::caseS()
+void Camera::caseS(float deltaTime)
 {
-	Vector3 deltaMove = -(cameraPos - cameraTarget).Normalize() * 0.2f * cameraSpeed;
+	Vector3 deltaMove = -(cameraPos - cameraTarget).Normalize() * deltaTime*2 * cameraSpeed;
 	cameraPos -= deltaMove;
 	cameraTarget -= deltaMove;
-	std::cout << "S";
+	//std::cout << "S";
 }
 
-void Camera::caseA()
+void Camera::caseA(float deltaTime)
 {
 	Vector3 zaxis = (cameraPos - cameraTarget).Normalize();
-	Vector3 deltaMove = -(up.Cross(zaxis)).Normalize() * 0.2f * cameraSpeed;
-	cameraPos -= deltaMove;
-	cameraTarget -= deltaMove;
-}
-
-void Camera::caseD()
-{
-	Vector3 zaxis = (cameraPos - cameraTarget).Normalize();
-	Vector3 deltaMove = -(up.Cross(zaxis)).Normalize() * 0.2f * cameraSpeed;
+	Vector3 deltaMove = -(up.Cross(zaxis)).Normalize() * deltaTime*2 * cameraSpeed;
 	cameraPos += deltaMove;
 	cameraTarget += deltaMove;
+}
+
+void Camera::caseD(float deltaTime)
+{
+	Vector3 zaxis = (cameraPos - cameraTarget).Normalize();
+	Vector3 deltaMove = -(up.Cross(zaxis)).Normalize() * deltaTime*2 * cameraSpeed;
+	cameraPos -= deltaMove;
+	cameraTarget -= deltaMove;
 }
 
 Matrix Camera::GetPerspective()
@@ -77,64 +70,72 @@ Matrix Camera::GetPerspective()
 	}
 	std::cout << std::endl;*/
 
-	return mPerspectiveMatrix;
+	return camPerspective;
 }
+
 
 Matrix Camera::GetViewMatrix()
 {
-	Matrix mViewMatrix;
-	Vector3 xaxis, yaxis, zaxis;
-	zaxis = (cameraPos - cameraTarget).Normalize();//cameraDirect
-	xaxis = (up.Cross(zaxis)).Normalize();//cameraRight
-	yaxis = (zaxis.Cross(xaxis)).Normalize();
-
-	mViewMatrix.m[0][0] = xaxis.x;
-	mViewMatrix.m[0][1] = yaxis.x;
-	mViewMatrix.m[0][2] = zaxis.x;
-	mViewMatrix.m[0][3] = 0;
-
-	mViewMatrix.m[1][0] = xaxis.y;
-	mViewMatrix.m[1][1] = yaxis.y;
-	mViewMatrix.m[1][2] = zaxis.y;
-	mViewMatrix.m[1][3] = 0;
-
-	mViewMatrix.m[2][0] = xaxis.z;
-	mViewMatrix.m[2][1] = yaxis.z;
-	mViewMatrix.m[2][2] = zaxis.z;
-	mViewMatrix.m[2][3] = 0;
-
-	mViewMatrix.m[3][0] = -cameraPos.Dot(xaxis);
-	mViewMatrix.m[3][1] = -cameraPos.Dot(yaxis);
-	mViewMatrix.m[3][2] = -cameraPos.Dot(zaxis);
-	mViewMatrix.m[3][3] = 1;
-
-	/*for (int i = 0; i < 4; i++) {
+	Matrix view;
+	view.m[0][0] = xaxis.x; view.m[1][0] = xaxis.y; view.m[2][0] = xaxis.z; view.m[3][0] = -cameraPos.Dot(xaxis);
+	view.m[0][1] = yaxis.x; view.m[1][1] = yaxis.y; view.m[2][1] = yaxis.z; view.m[3][1] = -cameraPos.Dot(yaxis);
+	view.m[0][2] = zaxis.x; view.m[1][2] = zaxis.y; view.m[2][2] = zaxis.z; view.m[3][2] = -cameraPos.Dot(zaxis);
+	view.m[0][3] = 0;	    view.m[1][3] = 0;		view.m[2][3] = 0;		view.m[3][3] = 1;
+	
+	/*std::cout << "Check view: " << std::endl;
+	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			std::cout << mViewMatrix.m[i][j] << " ";
+			std::cout << view.m[i][j] << " ";
 		}
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;*/
-
-	return mViewMatrix;
+	return view;
 }
 
 Matrix Camera::GetWorldMatrix()
 {
-	Matrix mWorldMatrix;
-	mWorldMatrix = mWorldMatrix.Invert(GetViewMatrix());
+	Matrix w;
+	w = w.Invert(GetViewMatrix());
+	Matrix ma = w * GetViewMatrix();
 	
-	/*Matrix ma = mWorldMatrix * GetViewMatrix();
-	std::cout << "Check validity: " << std::endl;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			std::cout << ma.m[i][j] << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;*/
+	return w;
+}
 
-	return mWorldMatrix;
+void Camera::RotateAroundX(GLfloat deltaTime) {
+	Vector4 rotationAxis = Vector4(1, 0, 0, 0) * GetViewMatrix();
+	float angle = deltaTime * cameraSpeed;
+	Matrix rotation;
+	rotation.SetIdentity();
+	rotation.SetRotationAngleAxis(angle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
+	Vector4 localTarget = Vector4(0, 0, -(cameraPos - cameraTarget).Length(), 1);
+	Vector4 localNewTarget = localTarget * rotation;
+	Vector4 worldNewTarget = localNewTarget * GetWorldMatrix();
+	cameraTarget = Vector3(worldNewTarget.x, worldNewTarget.y, worldNewTarget.z);
+}
+
+void Camera::RotateAroundY(float deltaTime) {
+	Vector4 rotationAxis = Vector4(0, 1, 0, 0) * GetViewMatrix();
+	float angle = deltaTime * cameraSpeed;
+	Matrix rotation;
+	rotation.SetIdentity();
+	rotation.SetRotationAngleAxis(angle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
+	Vector4 localTarget = Vector4(0, 0, -(cameraPos - cameraTarget).Length(), 1);
+	Vector4 localNewTarget = localTarget * rotation;
+	Vector4 worldNewTarget = localNewTarget * GetWorldMatrix();
+	cameraTarget = Vector3(worldNewTarget.x, worldNewTarget.y, worldNewTarget.z);
+}
+
+void Camera::RotateAroundZ(float deltaTime) {
+	Vector4 rotationAxis = Vector4(0, 0, 1, 0) * GetViewMatrix();
+	float angle = deltaTime * cameraSpeed;
+	Matrix rotation;
+	rotation.SetIdentity();
+	rotation.SetRotationAngleAxis(angle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
+	Vector4 localTarget = Vector4(0, 0, -(cameraPos - cameraTarget).Length(), 1);
+	Vector4 localNewTarget = localTarget * rotation;
+	Vector4 worldNewTarget = localNewTarget * GetWorldMatrix();
+	cameraTarget = Vector3(worldNewTarget.x, worldNewTarget.y, worldNewTarget.z);
 }
 
 

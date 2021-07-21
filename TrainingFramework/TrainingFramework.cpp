@@ -15,12 +15,21 @@
 #include <iostream>
 #include <GLES2/gl2.h>
 
+#define MOVE_FORWARD 1
+#define MOVE_BACKWARD 1 << 1
+#define MOVE_LEFT 1 << 2
+#define MOVE_RIGHT 1 << 3
+#define ROTATE_X 1 << 4
+#define ROTATE_Y 1 << 5
+#define ROTATE_Z 1 << 6
+
+int keyPressed = 0;
+
 GLuint vboId, iboId;
 Shaders myShaders;
 Texture* textureWoman;
 Model* modelWoman;
-MVP mvp;
-GLfloat a = 1.0f;
+MVP *mvp = new MVP(myShaders);
 Camera cam = Camera();
 
 int Init(ESContext* esContext)
@@ -30,18 +39,12 @@ int Init(ESContext* esContext)
 	//buffer object
 	glGenBuffers(1, &vboId);
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(verticesData), verticesData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &iboId);
 	glBindBuffer(GL_ARRAY_BUFFER, iboId);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
-	//cam.GetPerspective();
-	//cam.GetViewMatrix();
-	//cam.GetWorldMatrix();
-	cam.camWorld();
 	//Textures
 	textureWoman = new Texture("../Resources/Woman1.tga");
 	textureWoman->Init();
@@ -53,6 +56,9 @@ int Init(ESContext* esContext)
 	modelWoman->Init();
 	glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
+	
+	//cam.GetViewMatrix();
+	//cam.GetWorldMatrix();
 	//creation of shaders and program 
 	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 
@@ -64,7 +70,6 @@ void Draw(ESContext* esContext)
 	
 	glUseProgram(myShaders.program);
 	glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);
-	//glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);
 
 	if (myShaders.positionAttribute != -1)
@@ -87,14 +92,12 @@ void Draw(ESContext* esContext)
 	
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
-	mvp = MVP(myShaders);
-	//mvp.RotateModel(2.0f,3.14f, 3.14f);
-	//mvp.ScaleModel(0.8f);
-	//mvp.TranslateModel(0.2f, 0.0f, 1.0f);
-	mvp.transform(cam.GetViewMatrix(), cam.GetPerspective());//CameraWorld Transform
+	
+	mvp = new MVP(myShaders);
+	mvp->transform(cam.GetViewMatrix(), cam.GetPerspective());//CameraWorld Transform
+	delete mvp;
 	glDrawElements(GL_TRIANGLES, modelWoman->mNumberOfIndices, GL_UNSIGNED_INT, 0);
 	
-	//delete mvp;
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -104,23 +107,102 @@ void Draw(ESContext* esContext)
 
 void Update(ESContext* esContext, float deltaTime)
 {
-	
+	if (keyPressed & MOVE_FORWARD) {
+		cam.caseW(deltaTime);
+	}
+
+	if (keyPressed & MOVE_BACKWARD) {
+		cam.caseS(deltaTime);
+	}
+
+	if (keyPressed & MOVE_LEFT) {
+		cam.caseA(deltaTime);
+	}
+
+	if (keyPressed & MOVE_RIGHT) {
+		cam.caseD(deltaTime);
+	}
+
+	if (keyPressed & ROTATE_X) {
+		cam.RotateAroundX(deltaTime);
+	}
+
+	if (keyPressed & ROTATE_Y) {
+		cam.RotateAroundY(deltaTime);
+	}
+
+	if (keyPressed & ROTATE_Z) {
+		cam.RotateAroundZ(deltaTime);
+	}
+	cam.Update();
 }
 
 void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
 {
-	switch (key)
-	{
-	case 'W': cam.caseW(); break;
-	case 'w' : cam.caseW();
+	if (bIsPressed) {
+		if (key == 'W') {
+			keyPressed = keyPressed | MOVE_FORWARD;
+			return;
+		}
 
-	case 'A': cam.caseA(); break;
+		if (key == 'S') {
+			keyPressed = keyPressed | MOVE_BACKWARD;
+			return;
+		}
 
-	case 'S': cam.caseS(); break;
-
-	case 'D': cam.caseD(); break;
+		if (key == 'A') {
+			keyPressed = keyPressed | MOVE_LEFT;
+			return;
+		}
+		if (key == 'D') {
+			keyPressed = keyPressed | MOVE_RIGHT;
+			return;
+		}
+		if (key == 'x' || key == 'X') {
+			keyPressed = keyPressed | ROTATE_X;
+			return;
+		}
+		if (key == 'y' || key == 'Y') {
+			keyPressed = keyPressed | ROTATE_Y;
+			return;
+		}
+		if (key == 'z' || key == 'Z') {
+			keyPressed = keyPressed | ROTATE_Z;
+			return;
+		}
 	}
+	else {
+		if (key == 'W') {
+			keyPressed = keyPressed ^ MOVE_FORWARD;
+			return;
+		}
 
+		if (key == 'S') {
+			keyPressed = keyPressed ^ MOVE_BACKWARD;
+			return;
+		}
+
+		if (key == 'A') {
+			keyPressed = keyPressed ^ MOVE_LEFT;
+			return;
+		}
+		if (key == 'D') {
+			keyPressed = keyPressed ^ MOVE_RIGHT;
+			return;
+		}
+		if (key == 'x' || key == 'X') {
+			keyPressed = keyPressed ^ ROTATE_X;
+			return;
+		}
+		if (key == 'y' || key == 'Y') {
+			keyPressed = keyPressed ^ ROTATE_Y;
+			return;
+		}
+		if (key == 'z' || key == 'Z') {
+			keyPressed = keyPressed ^ ROTATE_Z;
+			return;
+		}
+	}
 }
 
 void CleanUp()

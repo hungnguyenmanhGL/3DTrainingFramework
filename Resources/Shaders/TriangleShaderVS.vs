@@ -6,17 +6,14 @@ attribute vec2 a_uv;
 varying vec2 v_uv;
 
 
-attribute vec4 a_CubeVertexPos;
-uniform mat4 transform;
-varying vec2 texCoord;
+uniform mat4 u_Model;
+uniform mat4 u_View;
+uniform mat4 u_Projection;
 
 void main()
 {
 	vec4 posL = vec4(a_posL, 1.0);
-	gl_Position = transform*posL;
-	//texCoord = vec2(atexCoord.x, atexCoord.y);
-	//gl_Position = u_CubeMVPMatrix * a_CubeVertexPos;
-	//v_pos = a_CubeVertexPos;
+	gl_Position = u_Projection * u_View * u_Model * vec4(a_posL, 1);
 	v_color = a_color;
 	v_uv = a_uv;
 }

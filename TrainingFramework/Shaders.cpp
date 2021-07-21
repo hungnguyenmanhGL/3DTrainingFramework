@@ -24,6 +24,9 @@ int Shaders::Init(char * fileVertexShader, char * fileFragmentShader)
 	textureUniform = glGetUniformLocation(program, "u_texture");
 	uvAttribute = glGetAttribLocation(program, "a_uv");
 
+	u_Model = glGetUniformLocation(program, "u_Model");
+	u_View = glGetUniformLocation(program, "u_View");
+	u_Projection = glGetUniformLocation(program, "u_Projection");
 	//transformUniform = glGetUniformLocation(program, "transform");
 
  	return 0;
