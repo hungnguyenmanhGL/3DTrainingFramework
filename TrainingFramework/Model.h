@@ -9,9 +9,14 @@ public:
 	void LoadNFGFile(FILE* file);
 	GLuint mVBO;
 	GLuint mIBO;
+	int mNumberOfVertex;
 	int mNumberOfIndices;
 	void Init();
+	void Draw();
+	void Bind();
+	void Unbind();
 	Model(const char* modelFile);
+	Model();
 	~Model();
 };
 

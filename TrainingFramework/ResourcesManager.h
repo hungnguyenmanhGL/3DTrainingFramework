@@ -10,7 +10,9 @@
 #include "Math.h"
 #include <conio.h>
 #include <iostream>
+#include <vector>
 #include <GLES2/gl2.h>
+using namespace std;
 class ResourcesManager
 {
 public:
@@ -20,9 +22,18 @@ public:
 	int numCubeTexture;
 	int numShader;
 
+	vector<Model> modelList;
+	vector<Texture> textureList;
+	vector <Shaders> shaderList;
+
 	void LoadResourcesCount(FILE* file);
 	void Init();
 
-	ResourcesManager(const char *filePath);
+	Model getModel(int id);
+	Texture getTexture(int id);
+	Shaders getShader(int id);
+
+	ResourcesManager(char *filePath);
+	void Check();
 };
 

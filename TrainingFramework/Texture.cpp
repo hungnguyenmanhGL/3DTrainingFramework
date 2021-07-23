@@ -41,6 +41,10 @@ Texture::Texture(const char* tgaFilePath)
 {
 	mTgaFilePath = strdup(tgaFilePath);
 }
+Texture::Texture()
+{
+
+}
 
 Texture::~Texture()
 {

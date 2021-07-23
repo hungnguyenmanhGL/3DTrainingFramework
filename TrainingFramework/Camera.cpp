@@ -17,6 +17,16 @@ Camera::Camera()
 	Update();
 }
 
+void Camera::Init()
+{
+	zaxis = (cameraPos - cameraTarget).Normalize();
+	xaxis = (up.Cross(zaxis)).Normalize();
+	yaxis = (zaxis.Cross(xaxis)).Normalize();
+	GetWorldMatrix();
+	GetViewMatrix();
+	GetPerspective();
+}
+
 void Camera::Update()
 {
 	zaxis = (cameraPos - cameraTarget).Normalize();//cameraDirect

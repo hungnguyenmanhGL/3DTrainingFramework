@@ -9,12 +9,13 @@ class Camera
 public:
 
 	float cameraSpeed = 0.1f;
+	float rotationSpeed;
 	float mFOV = 1.0f;
 	float mNear = 0.1f;
 	float mFar = 1000.0f;
 	Vector3 xaxis, yaxis, zaxis;
 
-
+	int id;
 	Vector3 cameraPos = Vector3(0.0f, 0.0f, 3.0f);
 	Vector3 cameraTarget = Vector3(0.0f, 0.0f, 0.0f);
 	Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
@@ -34,6 +35,7 @@ public:
 	void RotateAroundY(float deltaTime);
 	void RotateAroundZ(float deltaTime);
 	void Update();
+	void Init();
 
 	Matrix GetPerspective();
 	Matrix GetViewMatrix();

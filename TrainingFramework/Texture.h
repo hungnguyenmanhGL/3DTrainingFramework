@@ -4,15 +4,16 @@
 class Texture
 {
 private:
-	char* mTgaFilePath;
 	void ConfigTexture();
 public:
 	GLuint mTextureId;
-	GLuint wrapMode;
-	GLuint filterMode;
-
+	char wrapMode[20];
+	char filterMin[20];
+	char filterMag[20];
+	char* mTgaFilePath;
 	void Init();
 	Texture(const char* tgaFilePath);
+	Texture();
 	~Texture();
 };
 

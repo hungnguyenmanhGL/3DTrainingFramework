@@ -11,6 +11,9 @@
 #include "Camera.h"
 #include "MVP.h"
 #include "Math.h"
+#include "ResourcesManager.h"
+#include "SceneManager.h"
+#include "Object.h"
 #include <conio.h>
 #include <iostream>
 #include <GLES2/gl2.h>
@@ -31,81 +34,74 @@ int keyPressed = 0;
 GLuint vboId, iboId;
 Shaders myShaders;
 Texture* textureWoman;
-Model* modelWoman;
+Model modelWoman = Model("0");
 MVP *mvp = new MVP(myShaders);
-Camera cam = Camera();
 
-
+ResourcesManager rm = ResourcesManager("../Resources/RM1.txt");
+SceneManager sm = SceneManager("../Resources/SM1.txt");
+Camera cam = sm.camera;
 int Init(ESContext* esContext)
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	
+	//Init resources
+	rm.Init();
+	sm.InitSceneManager();
+	sm.Init();
+	cam = sm.camera;
 	//buffer object
-	glGenBuffers(1, &vboId);
+	/*glGenBuffers(1, &vboId);
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &iboId);
 	glBindBuffer(GL_ARRAY_BUFFER, iboId);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 	
 	//Textures
-	textureWoman = new Texture("../Resources/Woman1.tga");
-	textureWoman->Init();
-	glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);
+	//textureWoman = new Texture("../Resources/Woman1.tga");
+	//textureWoman = new Texture(rm.getTexture(0).mTgaFilePath);
+	//textureWoman->Init();
+	//sm.objectList.at(0).oTexture.at(0).Init();
+	//sm.objectList.at(1).oTexture.at(0).Init();
+	//glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);//already in texture->Init
 	glEnable(GL_DEPTH_TEST);
 
 	//task 4 load
-	modelWoman = new Model("../Resources/Woman1.nfg");
-	modelWoman->Init();
-	glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
+	//modelWoman = Model(rm.getModel(0).mModelFilePath);
+	//modelWoman.Init();
+	//sm.objectList.at(0).oModel.Init();
+	//sm.objectList.at(1).oModel.Init();
+	//glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);//alreay in Model->Init
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
 	
-	//cam.GetViewMatrix();
-	//cam.GetWorldMatrix();
+	
 	//creation of shaders and program 
 	
-	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
-
+	//return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
+	return myShaders.Init(rm.getShader(0).fileVS, rm.getShader(0).fileFS);
 }
 
 void Draw(ESContext* esContext)
 {	
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glUseProgram(myShaders.program);
-	glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);
-	glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);
+	//glUseProgram(myShaders.program);
+	//glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);
+	
+	for (int i = 0; i < sm.objectList.size(); i++) {
 
-	if (myShaders.positionAttribute != -1)
-	{
-		glEnableVertexAttribArray(myShaders.positionAttribute);
-		glVertexAttribPointer(myShaders.positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	}
-	if (myShaders.colorAttribute != -1)
-	{
-		glEnableVertexAttribArray(myShaders.colorAttribute);
-		glVertexAttribPointer(myShaders.colorAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(Vector3));
-	}
+		
+		sm.objectList.at(i).Draw(myShaders);
 
-	if (myShaders.uvAttribute != -1)
-	{
-		glUniform1i(myShaders.textureUniform, 0);
-		glEnableVertexAttribArray(myShaders.uvAttribute);
-		glVertexAttribPointer(myShaders.uvAttribute, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2 * sizeof(Vector3)));
+		glUniformMatrix4fv(myShaders.u_Projection, 1, GL_FALSE, *cam.GetPerspective().m);
+		glUniformMatrix4fv(myShaders.u_View, 1, GL_FALSE, *cam.GetViewMatrix().m);
+		//sm.objectList.at(i).oModel.Unbind();
 	}
-	
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboId);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
-	
-	mvp = new MVP(myShaders);
-	mvp->transform(cam.GetViewMatrix(), cam.GetPerspective());//CameraWorld Transform
-	delete mvp;
-	glDrawElements(GL_TRIANGLES, modelWoman->mNumberOfIndices, GL_UNSIGNED_INT, 0);
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	/*glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*///Unbind()
 	
 	eglSwapBuffers(esContext->eglDisplay, esContext->eglSurface);
 }
@@ -238,7 +234,6 @@ void CleanUp()
 {
 	glDeleteBuffers(1, &vboId);
 	glDeleteBuffers(1, &iboId);
-	delete modelWoman;
 	delete textureWoman;
 }
 

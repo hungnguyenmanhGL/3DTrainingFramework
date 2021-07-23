@@ -8,7 +8,7 @@ void Model::LoadNFGFile(FILE *file)
 	int numVertices;
 	fscanf(file, "NrVertices: %d\n", &numVertices);
 	Vertex *vertices = new Vertex[numVertices];
-
+	mNumberOfVertex = numVertices;
 	//std::cout << numVertices << std::endl;
 
 	for (int i = 0; i < numVertices; ++i) {
@@ -47,13 +47,10 @@ void Model::LoadNFGFile(FILE *file)
 		std::cout << "Tangent: " << vertices[id].tangent.x << "," << vertices[id].tangent.y << "," << vertices[id].tangent.z << std::endl;
 		std::cout << "uv: " << vertices[id].uv.x << "," << vertices[id].uv.y << "." << std::endl;*/
 	}
-	glGenBuffers(1, &this->mVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->mVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * numVertices, vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	
 	int numIndices;
 	fscanf(file, "NrIndices: %d\n", &numIndices);
+
 	//std::cout << numIndices << std::endl;
 	int* indices = new int[numIndices];
 	for (int i = 0; i < numIndices; i += 3) {
@@ -64,19 +61,47 @@ void Model::LoadNFGFile(FILE *file)
 		*(indices + i) = iX; *(indices + i + 1) = iY; *(indices + i + 2) = iZ;
 		//std::cout << "Indices" << id << ": " << indices[i] << "," << indices[i+1] << "," << indices[i+2] << std::endl;
 	}
+
+	glGenBuffers(1, &this->mVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->mVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * numVertices, vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glGenBuffers(1, &this->mIBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->mIBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numIndices, indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	this->mNumberOfIndices = numIndices;
 	fclose(file);
 	delete vertices;
 	delete indices;
 };
 
+void Model::Draw()
+{
+	glDrawElements(GL_TRIANGLES, mNumberOfIndices, GL_UNSIGNED_INT, 0);
+}
+
+void Model::Bind()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIBO);
+}
+
+void Model::Unbind()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 Model::Model(const char* modelFilePath)
 {
 	mModelFilePath = strdup(modelFilePath);
+}
+Model::Model()
+{
+
 }
 Model::~Model()
 {
