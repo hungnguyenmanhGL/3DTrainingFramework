@@ -33,13 +33,10 @@ int keyPressed = 0;
 
 GLuint vboId, iboId;
 Shaders myShaders;
-Texture* textureWoman;
-Model modelWoman = Model("0");
-MVP *mvp = new MVP(myShaders);
 
 ResourcesManager rm = ResourcesManager("../Resources/RM1.txt");
 SceneManager sm = SceneManager("../Resources/SM1.txt");
-Camera cam = sm.camera;
+
 int Init(ESContext* esContext)
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -48,35 +45,10 @@ int Init(ESContext* esContext)
 	rm.Init();
 	sm.InitSceneManager();
 	sm.Init();
-	cam = sm.camera;
-	//buffer object
-	/*glGenBuffers(1, &vboId);
-	glBindBuffer(GL_ARRAY_BUFFER, vboId);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glGenBuffers(1, &iboId);
-	glBindBuffer(GL_ARRAY_BUFFER, iboId);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
+	
 	
 	//Textures
-	//textureWoman = new Texture("../Resources/Woman1.tga");
-	//textureWoman = new Texture(rm.getTexture(0).mTgaFilePath);
-	//textureWoman->Init();
-	//sm.objectList.at(0).oTexture.at(0).Init();
-	//sm.objectList.at(1).oTexture.at(0).Init();
-	//glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);//already in texture->Init
 	glEnable(GL_DEPTH_TEST);
-
-	//task 4 load
-	//modelWoman = Model(rm.getModel(0).mModelFilePath);
-	//modelWoman.Init();
-	//sm.objectList.at(0).oModel.Init();
-	//sm.objectList.at(1).oModel.Init();
-	//glBindBuffer(GL_ARRAY_BUFFER, modelWoman->mVBO);//alreay in Model->Init
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelWoman->mIBO);
-	
-	
-	//creation of shaders and program 
 	
 	//return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 	return myShaders.Init(rm.getShader(0).fileVS, rm.getShader(0).fileFS);
@@ -87,18 +59,18 @@ void Draw(ESContext* esContext)
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//glUseProgram(myShaders.program);
-	//glBindTexture(GL_TEXTURE_2D, textureWoman->mTextureId);
+	sm.Draw(myShaders);
+	/*glUniformMatrix4fv(myShaders.u_Projection, 1, GL_FALSE, *cam.GetPerspective().m);
+	glUniformMatrix4fv(myShaders.u_View, 1, GL_FALSE, *cam.GetViewMatrix().m);
 	
 	for (int i = 0; i < sm.objectList.size(); i++) {
 
 		
 		sm.objectList.at(i).Draw(myShaders);
 
-		glUniformMatrix4fv(myShaders.u_Projection, 1, GL_FALSE, *cam.GetPerspective().m);
-		glUniformMatrix4fv(myShaders.u_View, 1, GL_FALSE, *cam.GetViewMatrix().m);
-		//sm.objectList.at(i).oModel.Unbind();
-	}
+	}*/
+
+
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	/*glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*///Unbind()
@@ -109,41 +81,41 @@ void Draw(ESContext* esContext)
 void Update(ESContext* esContext, float deltaTime)
 {
 	if (keyPressed & MOVE_FORWARD) {
-		cam.caseW(deltaTime);
+		sm.camera.caseW(deltaTime);
 	}
 
 	if (keyPressed & MOVE_BACKWARD) {
-		cam.caseS(deltaTime);
+		sm.camera.caseS(deltaTime);
 	}
 
 	if (keyPressed & MOVE_LEFT) {
-		cam.caseA(deltaTime);
+		sm.camera.caseA(deltaTime);
 	}
 
 	if (keyPressed & MOVE_RIGHT) {
-		cam.caseD(deltaTime);
+		sm.camera.caseD(deltaTime);
 	}
 
 	if (keyPressed & ROTATE_X_UP) {
-		cam.RotateAroundX(deltaTime);
+		sm.camera.RotateAroundX(deltaTime);
 	}
 
 	if (keyPressed & ROTATE_X_DOWN) {
-		cam.RotateAroundX(-deltaTime);
+		sm.camera.RotateAroundX(-deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Y_LEFT) {
-		cam.RotateAroundY(deltaTime);
+		sm.camera.RotateAroundY(deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Y_RIGHT) {
-		cam.RotateAroundY(-deltaTime);
+		sm.camera.RotateAroundY(-deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Z) {
-		cam.RotateAroundZ(deltaTime);
+		sm.camera.RotateAroundZ(deltaTime);
 	}
-	cam.Update();
+	sm.camera.Update();
 }
 
 void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
@@ -234,7 +206,7 @@ void CleanUp()
 {
 	glDeleteBuffers(1, &vboId);
 	glDeleteBuffers(1, &iboId);
-	delete textureWoman;
+	//delete textureWoman;
 }
 
 int _tmain(int argc, TCHAR* argv[])

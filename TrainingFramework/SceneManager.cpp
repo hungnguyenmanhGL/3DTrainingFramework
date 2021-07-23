@@ -84,17 +84,13 @@ void SceneManager::InitSceneManager()
 
 		delete ob;
 	}
-
+	fclose(file);
 	/*for (int i = 0; i < numberOfObject; i++) {
 		std::cout << objectList.at(i).oPos.x << " " << objectList.at(i).oPos.y << " " << objectList.at(i).oPos.z << std::endl;
 		cout << objectList.at(i).oShaders.fileVS << " " << objectList.at(i).oShaders.fileFS << endl;
 	}*/
-
-	for (int i = 0; i < numberOfObject; i++) {
-
-	}
-
 }
+
 void SceneManager::Init()
 {
 	InitSceneManager();
@@ -111,4 +107,15 @@ void SceneManager::Init()
 	}
 	//Init camera
 	camera.Init();
+}
+
+void SceneManager::Draw(Shaders myShaders)
+{
+	glUniformMatrix4fv(myShaders.u_Projection, 1, GL_FALSE, *camera.GetPerspective().m);
+	glUniformMatrix4fv(myShaders.u_View, 1, GL_FALSE, *camera.GetViewMatrix().m);
+
+	for (int i = 0; i < objectList.size(); i++) {
+		objectList.at(i).Draw(myShaders);
+	}
+
 }

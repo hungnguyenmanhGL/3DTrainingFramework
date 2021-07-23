@@ -24,7 +24,7 @@ public:
 
 	void InitObject();
 	void BindTexture();
-	void Draw(Shaders shader);
+	void Draw(Shaders myShaders);
 
 	Matrix SetRotation();
 	Matrix SetWorldMatrix();

@@ -19,7 +19,7 @@ void ResourcesManager::LoadResourcesCount(FILE *file)
 	{
 		int id;
 		float scale = 1, offset=0;
-		char fileName[30];
+		char fileName[100];
 		fscanf(file, "ID %d\n", &id);
 		fscanf(file, "FILE %s\n", &fileName);
 		fscanf(file, "SCALE %f\n", &scale);
@@ -34,7 +34,7 @@ void ResourcesManager::LoadResourcesCount(FILE *file)
 	for (int i = 0; i < numTexture; i++)
 	{
 		int id;
-		char fileName[50];
+		char fileName[100];
 		char wrap[10], filter1[15], filter2[15];
 
 		fscanf(file, "ID %d\n", &id);
@@ -58,7 +58,7 @@ void ResourcesManager::LoadResourcesCount(FILE *file)
 	for (int i = 0; i < numCubeTexture; i++)
 	{
 		int cubeId;
-		char cubeFilePath[30];
+		char cubeFilePath[100];
 		char wrapMode[10];
 		char filterMode[10];
 		char filter2[10];
@@ -68,7 +68,7 @@ void ResourcesManager::LoadResourcesCount(FILE *file)
 		fscanf(file, "WRAP %s\n", &wrapMode);
 		fscanf(file, "FILTER %s %s\n", &filterMode, &filter2);
 
-		//cout << cubeFilePath << " " << wrapMode << " " << filterMode << " " << filter2 << endl;
+		cout << cubeFilePath << " " << wrapMode << " " << filterMode << " " << filter2 << endl;
 	}
 
 	fscanf(file, "#Shaders: %d\n", &numShader);
@@ -117,6 +117,8 @@ void ResourcesManager::Init()
 		LoadResourcesCount(file);
 	}
 	else std::cout << "Fail to load resource file!" << std::endl;
+
+	fclose(file);
 }
 
 Model ResourcesManager::getModel(int id)

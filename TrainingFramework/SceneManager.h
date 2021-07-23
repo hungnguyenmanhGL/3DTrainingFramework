@@ -13,7 +13,8 @@ public:
 	SceneManager(char* file);
 	void Init();
 	void InitSceneManager();
+	void Draw(Shaders myShaders);
 
-	static SceneManager* s_Instance;
-	static SceneManager* GetInstance(char* file);
+	//static SceneManager* s_Instance;
+	//static SceneManager* GetInstance(char* file);
 };
