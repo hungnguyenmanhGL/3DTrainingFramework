@@ -27,7 +27,7 @@ void Model::LoadNFGFile(FILE *file)
 		fscanf(file, "tgt:[%f, %f, %f]; ", &tgtX, &tgtY, &tgtZ);
 		fscanf(file, "uv:[%f, %f];\n ", &uvX, &uvY);
 
-		(vertices + i)->pos.x = posX; (vertices + i)->pos.y = posY - 1; (vertices + i)->pos.z = posZ;
+		(vertices + i)->pos.x = posX; (vertices + i)->pos.y = posY; (vertices + i)->pos.z = posZ;
 		(vertices + i)->uv.x = uvX; (vertices + i)->uv.y = uvY;
 		/*std::cout << "Pos: " << posX << "," << posY << "," << posZ << std::endl;
 		std::cout << "Norm: " << normX << "," << normY << "," << normZ << std::endl;
@@ -41,11 +41,11 @@ void Model::LoadNFGFile(FILE *file)
 		vertices[id].tangent.x = tgtX; vertices[id].tangent.y = tgtY; vertices[id].tangent.z = tgtZ;
 		vertices[id].uv.x = uvX; vertices[id].uv.y = uvY;*/
 
-		/*std::cout << "Pos: " << vertices[id].pos.x << "," << vertices[id].pos.y << "," << vertices[id].pos.z << std::endl;
-		std::cout << "Norm: " << vertices[id].normal.x << "," << vertices[id].normal.y << "," << vertices[id].normal.z << std::endl;
+		//std::cout << "Pos: " << vertices[id].pos.x << "," << vertices[id].pos.y << "," << vertices[id].pos.z << std::endl;
+		/*std::cout << "Norm: " << vertices[id].normal.x << "," << vertices[id].normal.y << "," << vertices[id].normal.z << std::endl;
 		std::cout << "Binorm: " << vertices[id].binormal.x << "," << vertices[id].binormal.y << "," << vertices[id].binormal.z << std::endl;
-		std::cout << "Tangent: " << vertices[id].tangent.x << "," << vertices[id].tangent.y << "," << vertices[id].tangent.z << std::endl;
-		std::cout << "uv: " << vertices[id].uv.x << "," << vertices[id].uv.y << "." << std::endl;*/
+		std::cout << "Tangent: " << vertices[id].tangent.x << "," << vertices[id].tangent.y << "," << vertices[id].tangent.z << std::endl;*/
+		//std::cout << "uv: " << vertices[id].uv.x << "," << vertices[id].uv.y << "." << std::endl;
 	}
 	
 	int numIndices;
@@ -113,6 +113,7 @@ Model::~Model()
 void Model::Init()
 {
 	FILE* file = fopen(mModelFilePath, "rb");
+	//std::cout << mModelFilePath << std::endl;
 	if (file != NULL)
 	{
 		LoadNFGFile(file);

@@ -1,6 +1,8 @@
 #pragma once
 #include "../Utilities/utilities.h"
 #include <cstdio>
+#include <vector>
+#include <string>
 class Texture
 {
 private:
@@ -15,5 +17,6 @@ public:
 	Texture(const char* tgaFilePath);
 	Texture();
 	~Texture();
+	void cubeInit(std::vector<char*> faces);
 };
 

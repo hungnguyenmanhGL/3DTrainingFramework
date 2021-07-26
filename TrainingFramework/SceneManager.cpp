@@ -23,10 +23,10 @@ void SceneManager::InitSceneManager()
 	FILE* file = fopen(sceneManagerFile, "r");
 	if (file == NULL)
 	{
-		std::cout << "No file found" << std::endl;
+		std::cout << "No file found for SceneManager" << std::endl;
 		return;
 	}
-	else std::cout << "File opened" << std::endl;
+	else std::cout << "File opened for SceneManager" << std::endl;
 	//Camera
 	fscanf(file, "#Cameras: %d\n", &numberOfCam);
 	for (int i = 0; i < numberOfCam; i++)
@@ -59,7 +59,7 @@ void SceneManager::InitSceneManager()
 		int modelId, textureId, shaderId, cubeTextureId;
 		int light;
 		fscanf(file, "ID %d\n", &ob->id);
-		cout << ob->id << endl;
+		//cout << ob->id << endl;
 		fscanf(file, "MODEL %d\n", &modelId);
 		//cout << modelId << endl;
 		ob->oModel = resource.modelList.at(modelId);

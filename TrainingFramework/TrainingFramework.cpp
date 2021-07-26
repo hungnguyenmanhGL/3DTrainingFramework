@@ -33,9 +33,17 @@ int keyPressed = 0;
 
 GLuint vboId, iboId;
 Shaders myShaders;
-
 ResourcesManager rm = ResourcesManager("../Resources/RM1.txt");
 SceneManager sm = SceneManager("../Resources/SM1.txt");
+
+Shaders skyShader;
+Texture skyBox;
+Model skyBoxModel = Model("../Resources/Models/SkyBox.nfg");
+Object o; 
+
+MVP mvp = MVP();
+Camera camera = Camera();
+vector <char*> faces;
 
 int Init(ESContext* esContext)
 {
@@ -43,27 +51,87 @@ int Init(ESContext* esContext)
 	
 	//Init resources
 	rm.Init();
-	sm.InitSceneManager();
-	sm.Init();
+	//sm.InitSceneManager();
+	//sm.Init();
+
+	skyBoxModel = Model("../Resources/Models/SkyBox.nfg");
+	//skyBoxModel.Init();
+	//glBindBuffer(GL_ARRAY_BUFFER, skyBoxModel.mVBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyBoxModel.mIBO);
+
+	o.oModel = skyBoxModel;
+	o.oModel.Init();
+	o.oModel.Bind();
+
+	faces.push_back("../Resources/Skybox Textures/back.tga");
+	faces.push_back("../Resources/Skybox Textures/bottom.tga");
+	faces.push_back("../Resources/Skybox Textures/front.tga");
+	faces.push_back("../Resources/Skybox Textures/left.tga");
+	faces.push_back("../Resources/Skybox Textures/right.tga");
+	faces.push_back("../Resources/Skybox Textures/top.tga");
+	//skyBox.cubeInit(faces);
+
+	o.oTexture.push_back(skyBox);
+	o.oTexture.at(0).cubeInit(faces);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, o.oTexture.at(0).mTextureId);//skyBox
+
+
+
+	skyShader.Init("../Resources/Shaders/CubeShaderVS.vs", "../Resources/Shaders/CubeShaderFS.fs");
 	
-	
-	//Textures
 	glEnable(GL_DEPTH_TEST);
 	
 	//return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
-	return myShaders.Init(rm.getShader(0).fileVS, rm.getShader(0).fileFS);
+	return myShaders.Init("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
 }
 
 void Draw(ESContext* esContext)
 {	
-	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glUseProgram(skyShader.program);
+	//glBindTexture(GL_TEXTURE_CUBE_MAP, skyBox.mTextureId);
+	//glBindBuffer(GL_ARRAY_BUFFER, skyBoxModel.mVBO);
+
+	////sm.Draw(myShaders);
+
+	//if (skyShader.positionAttribute != -1)
+	//{
+	//	glEnableVertexAttribArray(skyShader.positionAttribute);
+	//	glVertexAttribPointer(skyShader.positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	//}
+	//if (skyShader.colorAttribute != -1)
+	//{
+	//	glEnableVertexAttribArray(skyShader.colorAttribute);
+	//	glVertexAttribPointer(skyShader.colorAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(Vector3));
+	//}
+
+	//if (skyShader.uvAttribute != -1)
+	//{
+	//	glUniform1i(skyShader.textureUniform, 0);
+	//	glEnableVertexAttribArray(skyShader.uvAttribute);
+	//	glVertexAttribPointer(skyShader.uvAttribute, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2 * sizeof(Vector3)));
+	//}
+	//
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyBoxModel. mIBO);
+	o.DrawCube(skyShader);
+
+	mvp = MVP(skyShader);
+	mvp.ScaleModel(200.0f);
+	mvp.RotateModel(0.0, 0.0, 0.0);
+	mvp.TranslateModel(0.0, 0.0, 0.0);
+	mvp.transform(camera.GetViewMatrix(), camera.GetPerspective());
+
+	//glDrawElements(GL_TRIANGLES, skyBoxModel.mNumberOfIndices, GL_UNSIGNED_INT, 0);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	/*glUniformMatrix4fv(skyShader.u_Projection, 1, GL_FALSE, *sm.camera.GetPerspective().m);
+	glUniformMatrix4fv(skyShader.u_View, 1, GL_FALSE, *sm.camera.GetViewMatrix().m);*/
 	
-	sm.Draw(myShaders);
-	/*glUniformMatrix4fv(myShaders.u_Projection, 1, GL_FALSE, *cam.GetPerspective().m);
-	glUniformMatrix4fv(myShaders.u_View, 1, GL_FALSE, *cam.GetViewMatrix().m);
-	
-	for (int i = 0; i < sm.objectList.size(); i++) {
+	/*for (int i = 0; i < sm.objectList.size(); i++) {
 
 		
 		sm.objectList.at(i).Draw(myShaders);
@@ -81,41 +149,41 @@ void Draw(ESContext* esContext)
 void Update(ESContext* esContext, float deltaTime)
 {
 	if (keyPressed & MOVE_FORWARD) {
-		sm.camera.caseW(deltaTime);
+		camera.caseW(deltaTime);
 	}
 
 	if (keyPressed & MOVE_BACKWARD) {
-		sm.camera.caseS(deltaTime);
+		camera.caseS(deltaTime);
 	}
 
 	if (keyPressed & MOVE_LEFT) {
-		sm.camera.caseA(deltaTime);
+		camera.caseA(deltaTime);
 	}
 
 	if (keyPressed & MOVE_RIGHT) {
-		sm.camera.caseD(deltaTime);
+		camera.caseD(deltaTime);
 	}
 
 	if (keyPressed & ROTATE_X_UP) {
-		sm.camera.RotateAroundX(deltaTime);
+		camera.RotateAroundX(deltaTime);
 	}
 
 	if (keyPressed & ROTATE_X_DOWN) {
-		sm.camera.RotateAroundX(-deltaTime);
+		camera.RotateAroundX(-deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Y_LEFT) {
-		sm.camera.RotateAroundY(deltaTime);
+		camera.RotateAroundY(deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Y_RIGHT) {
-		sm.camera.RotateAroundY(-deltaTime);
+		camera.RotateAroundY(-deltaTime);
 	}
 
 	if (keyPressed & ROTATE_Z) {
-		sm.camera.RotateAroundZ(deltaTime);
+		camera.RotateAroundZ(deltaTime);
 	}
-	sm.camera.Update();
+	camera.Update();
 }
 
 void Key(ESContext* esContext, unsigned char key, bool bIsPressed)
@@ -207,6 +275,7 @@ void CleanUp()
 	glDeleteBuffers(1, &vboId);
 	glDeleteBuffers(1, &iboId);
 	//delete textureWoman;
+	skyBox.~Texture();
 }
 
 int _tmain(int argc, TCHAR* argv[])

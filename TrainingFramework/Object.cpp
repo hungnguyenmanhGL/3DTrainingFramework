@@ -73,8 +73,11 @@ Object::Object()
 void Object::Draw(Shaders myShaders)
 {
 	glUseProgram(myShaders.program);
+
 	oModel.Bind();
 	glBindTexture(GL_TEXTURE_2D, oTexture.at(0).mTextureId);
+	
+	//glBindTexture(GL_TEXTURE_2D, oTexture.at(0).mTextureId);
 
 	if (myShaders.positionAttribute != -1)
 	{
@@ -89,14 +92,46 @@ void Object::Draw(Shaders myShaders)
 
 	if (myShaders.uvAttribute != -1)
 	{
-		glUniform1i(myShaders.textureUniform, 0);
+		//glUniform1i(myShaders.textureUniform, 0);
 		glEnableVertexAttribArray(myShaders.uvAttribute);
 		glVertexAttribPointer(myShaders.uvAttribute, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2 * sizeof(Vector3)));
 	}
-
-	glUniformMatrix4fv(myShaders.u_Model, 1, GL_FALSE, *WorldMatrix.m);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, oModel.mIBO);
+	//glUniformMatrix4fv(myShaders.u_Model, 1, GL_FALSE, *WorldMatrix.m);
 
 	oModel.Draw();
 	oModel.Unbind();
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Object::DrawCube(Shaders myShaders)
+{
+	glUseProgram(myShaders.program);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, oTexture.at(0).mTextureId);
+	glBindBuffer(GL_ARRAY_BUFFER, oModel.mVBO);
+
+
+	if (myShaders.positionAttribute != -1)
+	{
+		glEnableVertexAttribArray(myShaders.positionAttribute);
+		glVertexAttribPointer(myShaders.positionAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	}
+	if (myShaders.colorAttribute != -1)
+	{
+		glEnableVertexAttribArray(myShaders.colorAttribute);
+		glVertexAttribPointer(myShaders.colorAttribute, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(Vector3));
+	}
+
+	if (myShaders.uvAttribute != -1)
+	{
+		//glUniform1i(myShaders.textureUniform, 0);
+		glEnableVertexAttribArray(myShaders.uvAttribute);
+		glVertexAttribPointer(myShaders.uvAttribute, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2 * sizeof(Vector3)));
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, oModel.mIBO);
+	//glUniformMatrix4fv(myShaders.u_Model, 1, GL_FALSE, *WorldMatrix.m);
+
+	oModel.Draw();
+	oModel.Unbind();
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

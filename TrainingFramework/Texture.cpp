@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Texture.h"
 #include <iostream>
+#include <vector>
+#include <string>
 
 void Texture::ConfigTexture()
 {
@@ -25,7 +27,7 @@ void Texture::Init()
 	glTexImage2D(GL_TEXTURE_2D, 0, format, iWidth, iHeight, 0, format, GL_UNSIGNED_BYTE, imageData);
 	if (imageData)
 	{
-		//std::cout << "Load texture succes" << std::endl;
+		std::cout << "Load texture success" << std::endl;
 		glTexImage2D(GL_TEXTURE_2D, 0, format, iWidth, iHeight, 0, format, GL_UNSIGNED_BYTE, imageData);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
@@ -50,4 +52,35 @@ Texture::~Texture()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDeleteTextures(1, &mTextureId);
+}
+
+void Texture::cubeInit(std::vector <char*> faces)
+{
+	int iWidth;
+	int iHeight;
+	int iBpp;
+
+	
+	glGenTextures(1, &mTextureId);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
+	for (int i = 0; i < 6; i++) {
+		const char* imageData = LoadTGA(faces.at(i), &iWidth, &iHeight, &iBpp);
+
+		if (imageData) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, iWidth, iHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+			//std::cout << faces.at(i) << std::endl;
+		}
+		else {
+			std::cout << "Fail to load " << faces.at(i) << std::endl;
+		}
+		delete imageData;
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

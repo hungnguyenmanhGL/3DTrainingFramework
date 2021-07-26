@@ -68,7 +68,7 @@ void ResourcesManager::LoadResourcesCount(FILE *file)
 		fscanf(file, "WRAP %s\n", &wrapMode);
 		fscanf(file, "FILTER %s %s\n", &filterMode, &filter2);
 
-		cout << cubeFilePath << " " << wrapMode << " " << filterMode << " " << filter2 << endl;
+		//cout << cubeFilePath << " " << wrapMode << " " << filterMode << " " << filter2 << endl;
 	}
 
 	fscanf(file, "#Shaders: %d\n", &numShader);
